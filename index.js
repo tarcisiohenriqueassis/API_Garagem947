@@ -57,6 +57,7 @@ app.post("/gerar-pdf-template", async (req, res) => {
       trySetField(form, "Text5", dados.telefone || "");
       trySetField(form, "Text3", (dados.marca || ""));
       trySetField(form, "Text2", (dados.modelo || "").toUpperCase());
+      trySetField(form, "Text12", dados.placa || "").toUpperCase();
       trySetField(form, "Text4", dados.ano || "");
       trySetField(form, "Text6", (dados.veiculo || ""));
       trySetField(form, "Text7", dados.servicosLanternagem || "", true);
