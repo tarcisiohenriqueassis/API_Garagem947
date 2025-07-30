@@ -10,22 +10,29 @@ const port = 3001;
 app.use(cors());
 app.use(express.json());
 
-// Função auxiliar para definir o texto de um campo no PDF
+// Nova função que preenche todos os campos com o mesmo nome
 function trySetField(form, name, value, multiline = false) {
-  try {
-    const field = form.getTextField(name);
-    field.setText(value || "");
+  const allFields = form.getFields().filter(f => f.getName() === name);
 
-    if (multiline) {
-      // Ativar multiline no campo (flag 4096)
-      const acroField = field.acroField;
-      acroField.setFlags((acroField.getFlags() || 0) | 4096);
-    }
-  } catch (e) {
+  if (allFields.length === 0) {
     console.warn(`Campo "${name}" não encontrado no PDF.`);
+    return;
   }
-}
 
+  allFields.forEach(() => {
+    try {
+      const field = form.getTextField(name);
+      field.setText(value || "");
+
+      if (multiline) {
+        const acroField = field.acroField;
+        acroField.setFlags((acroField.getFlags() || 0) | 4096);
+      }
+    } catch (e) {
+      console.warn(`Erro ao preencher campo "${name}":`, e.message);
+    }
+  });
+}
 
 // Rota para gerar PDF
 app.post("/gerar-pdf-template", async (req, res) => {
@@ -42,8 +49,8 @@ app.post("/gerar-pdf-template", async (req, res) => {
     const form = pdfDoc.getForm();
 
     // Log de campos existentes
-    //const fields = form.getFields();
-    //fields.forEach((f) => console.log("Campo encontrado:", f.getName()));
+    const fields = form.getFields();
+    fields.forEach((f) => console.log("Campo encontrado:", f.getName()));
 
     // Data atual por extenso
     const dataHoje = new Date().toLocaleDateString("pt-BR", {
@@ -52,21 +59,20 @@ app.post("/gerar-pdf-template", async (req, res) => {
       year: "numeric",
     });
 
-   // Preencher campos reais do PDF
-      trySetField(form, "Text1", (dados.cliente || "").toUpperCase());
-      trySetField(form, "Text5", dados.telefone || "");
-      trySetField(form, "Text3", (dados.marca || ""));
-      trySetField(form, "Text2", (dados.modelo || "").toUpperCase());
-      trySetField(form, "Text12", dados.placa || "").toUpperCase();
-      trySetField(form, "Text4", dados.ano || "");
-      trySetField(form, "Text6", (dados.veiculo || ""));
-      trySetField(form, "Text7", dados.servicosLanternagem || "", true);
-      trySetField(form, "Text8", dados.servicosPintura || "", true);
-      trySetField(form, "Text9", dados.servicosMecanica || "", true);
-      trySetField(form, "Text11", (dados.valorTotal || ""));
-      trySetField(form, "Text10", dataHoje);
+    // Preencher campos reais do PDF
+    trySetField(form, "Text1", (dados.cliente || "").toUpperCase());
+    trySetField(form, "Text5", dados.telefone || "");
+    trySetField(form, "Text3", dados.marca || "");
+    trySetField(form, "Text2", (dados.modelo || "").toUpperCase());
+    trySetField(form, "Text4", dados.ano || "");
+    trySetField(form, "Text6", dados.placa || "");
+    trySetField(form, "Text7", dados.servicosLanternagem || "", true);
+    trySetField(form, "Text8", dados.servicosPintura || "", true);
+    trySetField(form, "Text9", dados.servicosMecanica || "", true);
+    trySetField(form, "Text11", dados.valorTotal || "");
+    trySetField(form, "Text10", dataHoje);
 
-    // Bloquear edição
+    // Bloquear edição dos campos no PDF final
     form.flatten();
 
     const pdfBytes = await pdfDoc.save();
