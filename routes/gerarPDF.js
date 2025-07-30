@@ -9,12 +9,7 @@ router.post("/gerar-pdf", async (req, res) => {
   const dados = req.body;
 
   try {
-    const templatePath = path.join(
-      __dirname,
-      "..",
-      "templates",
-      "orcamentoTemplate.pdf" // sem acento no nome do arquivo
-    );
+    const templatePath = path.join(__dirname, "..", "templates", "orcamentoTemplate.pdf");
 
     if (!fs.existsSync(templatePath)) {
       return res.status(404).send("Template PDF não encontrado.");
@@ -24,21 +19,19 @@ router.post("/gerar-pdf", async (req, res) => {
     const pdfDoc = await PDFDocument.load(templateBytes);
     const form = pdfDoc.getForm();
 
-    // Data atual formatada
     const dataHoje = new Date().toLocaleDateString("pt-BR", {
       day: "2-digit",
       month: "long",
       year: "numeric",
     });
 
-    // Mapeamento dos campos
     const fieldsMap = {
       Text1: (dados.cliente || "").toUpperCase(),
       Text2: dados.telefone || "",
       Text3: (dados.marca || "").toUpperCase(),
       Text4: (dados.modelo || "").toUpperCase(),
-      Text5: dados.ano || "",
-      Text6: (dados.veiculo || "").toUpperCase(),
+      Text5: (dados.ano || ""),
+      Text6: (dados.placa || "").toUpperCase(),
       Text7: (dados.servicosLanternagem || ""),
       Text8: (dados.servicosPintura || ""),
       Text9: (dados.servicosMecanica || ""),
@@ -46,16 +39,21 @@ router.post("/gerar-pdf", async (req, res) => {
       Text11: (dataHoje || ""),
     };
 
-    // Preenche cada campo existente
     Object.entries(fieldsMap).forEach(([field, value]) => {
-      try {
-        form.getTextField(field).setText(value);
-      } catch {
-        console.warn(`Campo ${field} não encontrado no PDF`);
+      const allFields = form.getFields().filter(f => f.getName() === field);
+      if (allFields.length === 0) {
+        console.warn(`Campo ${field} não encontrado no PDF.`);
+        return;
       }
+      allFields.forEach(f => {
+        try {
+          if (f.constructor.name === "PDFTextField") f.setText(value);
+        } catch {
+          console.warn(`Erro ao preencher campo ${field}`);
+        }
+      });
     });
 
-    // Bloquear edição
     form.flatten();
 
     const pdfBytes = await pdfDoc.save();
@@ -63,11 +61,8 @@ router.post("/gerar-pdf", async (req, res) => {
     const nomeArquivo = `${nomeCliente}_ORÇAMENTO.pdf`;
 
     res.setHeader("Content-Type", "application/pdf");
-    res.setHeader(
-      "Content-Disposition",
-      `attachment; filename=${nomeArquivo}`
-    );
-    res.send(Buffer.from(pdfBytes));
+    res.setHeader("Content-Disposition", `attachment; filename=${nomeArquivo}`);
+    res.send(pdfBytes);
 
   } catch (error) {
     console.error("Erro ao gerar PDF:", error);

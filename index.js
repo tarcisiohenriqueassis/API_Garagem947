@@ -19,9 +19,8 @@ function trySetField(form, name, value, multiline = false) {
     return;
   }
 
-  allFields.forEach(() => {
+  allFields.forEach((field) => {
     try {
-      const field = form.getTextField(name);
       field.setText(value || "");
 
       if (multiline) {
@@ -33,6 +32,7 @@ function trySetField(form, name, value, multiline = false) {
     }
   });
 }
+
 
 // Rota para gerar PDF
 app.post("/gerar-pdf-template", async (req, res) => {
@@ -49,8 +49,8 @@ app.post("/gerar-pdf-template", async (req, res) => {
     const form = pdfDoc.getForm();
 
     // Log de campos existentes
-    const fields = form.getFields();
-    fields.forEach((f) => console.log("Campo encontrado:", f.getName()));
+    //const fields = form.getFields();
+    //fields.forEach((f) => console.log("Campo encontrado:", f.getName()));
 
     // Data atual por extenso
     const dataHoje = new Date().toLocaleDateString("pt-BR", {
