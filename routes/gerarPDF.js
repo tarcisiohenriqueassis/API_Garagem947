@@ -9,7 +9,7 @@ router.post("/gerar-pdf", async (req, res) => {
   const dados = req.body;
 
   try {
-    const templatePath = path.join(__dirname, "..", "templates", "orcamentoTemplate.pdf");
+    const templatePath = path.join(__dirname, "templates", "orçamentoTemplate.pdf");
 
     if (!fs.existsSync(templatePath)) {
       return res.status(404).send("Template PDF não encontrado.");
@@ -18,6 +18,9 @@ router.post("/gerar-pdf", async (req, res) => {
     const templateBytes = fs.readFileSync(templatePath);
     const pdfDoc = await PDFDocument.load(templateBytes);
     const form = pdfDoc.getForm();
+
+    //const fields = form.getFields();
+    //fields.forEach((f) => console.log("Campo encontrado:", f.getName()));
 
     const dataHoje = new Date().toLocaleDateString("pt-BR", {
       day: "2-digit",
@@ -30,31 +33,26 @@ router.post("/gerar-pdf", async (req, res) => {
       Text2: dados.telefone || "",
       Text3: (dados.marca || "").toUpperCase(),
       Text4: (dados.modelo || "").toUpperCase(),
-      Text5: (dados.ano || ""),
+      Text5: dados.ano || "",
       Text6: (dados.placa || "").toUpperCase(),
-      Text7: (dados.servicosLanternagem || ""),
-      Text8: (dados.servicosPintura || ""),
-      Text9: (dados.servicosMecanica || ""),
-      Text10: (dados.valorTotal || ""),
-      Text11: (dataHoje || ""),
+      textarea_12qbhl: dados.servicosLanternagem || "",
+      textarea_13nklh: dados.servicosPintura || "",
+      textarea_14ndp: dados.servicosMecanica || "",
+      Text10: dados.valorTotal || "",
+      Text11: dataHoje,
     };
-
-    Object.entries(fieldsMap).forEach(([field, value]) => {
-      const allFields = form.getFields().filter(f => f.getName() === field);
-      if (allFields.length === 0) {
-        console.warn(`Campo ${field} não encontrado no PDF.`);
-        return;
+ 
+    Object.entries(fieldsMap).forEach(([nomeCampo, valor]) => {
+      try {
+        const campo = form.getTextField(nomeCampo);
+        campo.setText(valor);
+      } catch (err) {
+        console.warn(`Campo "${nomeCampo}" não encontrado ou inválido.`);
       }
-      allFields.forEach(f => {
-        try {
-          if (f.constructor.name === "PDFTextField") f.setText(value);
-        } catch {
-          console.warn(`Erro ao preencher campo ${field}`);
-        }
-      });
     });
 
-    form.flatten();
+    // Flatten os campos para impedir edição
+     form.flatten();
 
     const pdfBytes = await pdfDoc.save();
     const nomeCliente = (dados.cliente || "cliente").replace(/\s+/g, "_").toUpperCase();
