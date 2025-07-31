@@ -73,7 +73,7 @@ app.post("/gerar-pdf-template", async (req, res) => {
     trySetField(form, "Text10", dataHoje);
 
     // Bloquear edição dos campos no PDF final
-    //form.flatten();
+      form.flatten();
 
     const pdfBytes = await pdfDoc.save();
     const nomeCliente = (dados.cliente || "cliente").replace(/\s+/g, "_").toUpperCase();
