@@ -49,7 +49,7 @@ app.post("/gerar-pdf-template", async (req, res) => {
     const form = pdfDoc.getForm();
 
     // Log de campos existentes
-    //const fields = form.getFields();
+    // const fields = form.getFields();
     //fields.forEach((f) => console.log("Campo encontrado:", f.getName()));
 
     // Data atual por extenso
@@ -73,7 +73,7 @@ app.post("/gerar-pdf-template", async (req, res) => {
     trySetField(form, "Text10", dataHoje);
 
     // Bloquear edição dos campos no PDF final
-    form.flatten();
+    //form.flatten();
 
     const pdfBytes = await pdfDoc.save();
     const nomeCliente = (dados.cliente || "cliente").replace(/\s+/g, "_").toUpperCase();
