@@ -38,7 +38,7 @@ app.post("/gerar-pdf-template", async (req, res) => {
       Text3: dados.marca || "",
       Text2: (dados.modelo || "").toUpperCase(),
       Text4: dados.ano || "",
-      Text6: dados.placa || "",
+      Text6: (dados.placa || "").toUpperCase,
       textarea_12qbhl: dados.servicosLanternagem || "",
       textarea_13nklh: dados.servicosPintura || "",
       textarea_14ndp: dados.servicosMecanica || "",
