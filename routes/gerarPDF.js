@@ -5,6 +5,8 @@ const { PDFDocument } = require("pdf-lib");
 
 const router = express.Router();
 
+const captalize = require("./utils/captalize");
+
 router.post("/gerar-pdf", async (req, res) => {
   const dados = req.body;
 
@@ -19,8 +21,8 @@ router.post("/gerar-pdf", async (req, res) => {
     const pdfDoc = await PDFDocument.load(templateBytes);
     const form = pdfDoc.getForm();
 
-    //const fields = form.getFields();
-    //fields.forEach((f) => console.log("Campo encontrado:", f.getName()));
+    const fields = form.getFields();
+    fields.forEach((f) => console.log("Campo encontrado:", f.getName()));
 
     const dataHoje = new Date().toLocaleDateString("pt-BR", {
       day: "2-digit",
@@ -29,17 +31,19 @@ router.post("/gerar-pdf", async (req, res) => {
     });
 
     const fieldsMap = {
-      Text1: (dados.cliente || "").toUpperCase(),
-      Text2: dados.telefone || "",
-      Text3: (dados.marca || "").toUpperCase(),
-      Text4: (dados.modelo || "").toUpperCase(),
-      Text5: dados.ano || "",
-      Text6: (dados.placa || "").toUpperCase(),
+      text_1: captalize(dados.cliente || ""),
+      text_2: dados.telefone || "",
+      text_3: captalize(dados.endereco || ""),
+      text_4: captalize(dados.marca || ""),
+      text_5: captalize(dados.modelo || ""),
+      text_6: captalize(dados.ano || ""),
+      text_7: captalize(dados.placa || ""),
+      text_8: dataHoje,
       textarea_12qbhl: dados.servicosLanternagem || "",
       textarea_13nklh: dados.servicosPintura || "",
       textarea_14ndp: dados.servicosMecanica || "",
-      Text10: dados.valorTotal || "",
-      Text11: dataHoje,
+      text_20: dados.cpf || "",
+      text_55cgcr: dados.valorTotal || "",
     };
  
     Object.entries(fieldsMap).forEach(([nomeCampo, valor]) => {

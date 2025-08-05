@@ -10,6 +10,8 @@ const port = 3001;
 app.use(cors());
 app.use(express.json());
 
+const captalize = require("./utils/capitalizeletter");
+
 app.post("/gerar-pdf-template", async (req, res) => {
   try {
     const dados = req.body;
@@ -23,8 +25,8 @@ app.post("/gerar-pdf-template", async (req, res) => {
     const pdfDoc = await PDFDocument.load(existingPdfBytes);
     const form = pdfDoc.getForm();
 
-    //const fields = form.getFields();
-    //fields.forEach((f) => console.log("Campo encontrado:", f.getName()));
+    const fields = form.getFields();
+    fields.forEach((f) => console.log("Campo encontrado:", f.getName()));
 
     const dataHoje = new Date().toLocaleDateString("pt-BR", {
       day: "2-digit",
@@ -33,17 +35,19 @@ app.post("/gerar-pdf-template", async (req, res) => {
     });
 
     const campos = {
-      Text1: (dados.cliente || "").toUpperCase(),
-      Text5: dados.telefone || "",
-      Text3: dados.marca || "",
-      Text2: (dados.modelo || "").toUpperCase(),
-      Text4: dados.ano || "",
-      Text6: (dados.placa || "").toUpperCase(),
+      text_1: captalize(dados.cliente || ""),
+      text_2: dados.telefone || "",
+      text_3: captalize(dados.endereco || ""),
+      text_4: captalize(dados.marca || ""),
+      text_5: captalize(dados.modelo || ""),
+      text_6: captalize(dados.ano || ""),
+      text_7: captalize(dados.placa || ""),
+      text_8: dataHoje,
       textarea_12qbhl: dados.servicosLanternagem || "",
       textarea_13nklh: dados.servicosPintura || "",
       textarea_14ndp: dados.servicosMecanica || "",
-      Text11: dados.valorTotal || "",
-      Text10: dataHoje,
+      text_20: dados.cpf || "",
+      text_55cgcr: dados.valorTotal || "",
     };
 
     // Preenche os campos usando a API oficial
