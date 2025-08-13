@@ -16,7 +16,7 @@ app.post("/gerar-pdf-template", async (req, res) => {
   try {
     const dados = req.body;
 
-    const pdfPath = path.join(__dirname, "templates", "orçamentoTemplate.pdf");
+    const pdfPath = path.join(__dirname, "templates", "orçamentoGaragem497.pdf");
     if (!fs.existsSync(pdfPath)) {
       return res.status(404).send("Template PDF não encontrado.");
     }
@@ -35,20 +35,21 @@ app.post("/gerar-pdf-template", async (req, res) => {
     });
 
     const campos = {
-      text_1: captalize(dados.cliente || ""),
-      text_2: dados.telefone || "",
-      text_3: captalize(dados.endereco || ""),
-      text_4: captalize(dados.marca || ""),
-      text_5: captalize(dados.modelo || ""),
-      text_6: captalize(dados.ano || ""),
-      text_7: captalize(dados.placa || ""),
-      text_8: dataHoje,
-      textarea_12qbhl: dados.servicosLanternagem || "",
-      textarea_13nklh: dados.servicosPintura || "",
-      textarea_14ndp: dados.servicosMecanica || "",
-      text_20: dados.cpf || "",
-      text_55cgcr: dados.valorTotal || "",
-    };
+          text_1_nome: captalize(dados.cliente || ""),
+          text_2_telefone: dados.telefone || "",
+          text_3_cpf: dados.cpf || "",
+          text_4_endereco: captalize(dados.endereco || ""),
+          text_5_marca: captalize(dados.marca || ""),
+          text_6_modelo: captalize(dados.modelo || ""),
+          text_7_ano: captalize(dados.ano || ""),
+          text_8_placa: captalize(dados.placa || ""),
+          text_13_data: dataHoje,
+          textarea_9_lanternagem: dados.servicosLanternagem || "",
+          textarea_10_pintura: dados.servicosPintura || "",
+          textarea_11_mecanica: dados.servicosMecanica || "",
+          textarea_12_pecas: dados.pecas || "",
+          text_14_valor: dados.valorTotal || "",
+        };
 
     // Preenche os campos usando a API oficial
     Object.entries(campos).forEach(([campo, valor]) => {
