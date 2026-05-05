@@ -72,8 +72,8 @@ app.post("/gerar-pdf-template", async (req, res) => {
     res.setHeader("Content-Disposition", `attachment; filename=${nomeArquivo}`);
     res.send(Buffer.from(pdfBytes));
   } catch (err) {
-    console.error("Erro ao gerar PDF:", err);
-    res.status(500).send("Erro ao gerar PDF");
+    console.error("Erro ao gerar PDF:", err.message);
+    console.error(err.stack);
   }
 });
 
