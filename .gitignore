@@ -1,0 +1,13 @@
+# node
+node_modules/
+dist/
+*.log
+# VSCode
+.vscode/
+
+# sistema operacional
+.DS_Store
+Thumbs.db
+
+# others
+npm-debug.log*
