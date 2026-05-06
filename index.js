@@ -61,11 +61,12 @@ app.post("/gerar-pdf-template", async (req, res) => {
         console.warn(`⚠️ Campo "${campo}" não encontrado ou inválido.`);
       }
     });
-    
-    form.updateFieldAppearances();
+  
+});
+
+form.updateFieldAppearances();
     form.getFields().forEach(field => {
     field.enableReadOnly();
-});
    // form.flatten(); // Torna os campos não editáveis
 
     const pdfBytes = await pdfDoc.save();
