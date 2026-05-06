@@ -62,7 +62,7 @@ app.post("/gerar-pdf-template", async (req, res) => {
       }
     });
   
-});
+
 
      // 🔥 NÃO USAR FLATTEN
     form.updateFieldAppearances();
