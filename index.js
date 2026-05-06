@@ -62,7 +62,7 @@ app.post("/gerar-pdf-template", async (req, res) => {
       }
     });
 
-    form.flatten(); // Torna os campos não editáveis
+   // form.flatten(); // Torna os campos não editáveis
 
     const pdfBytes = await pdfDoc.save();
     const nomeCliente = (dados.cliente || "cliente").replace(/\s+/g, "_").toUpperCase();
