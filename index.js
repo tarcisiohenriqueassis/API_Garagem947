@@ -7,7 +7,9 @@ const cors = require("cors");
 const app = express();
 const port = 3001;
 
-app.use(cors());
+app.use(cors({
+  origin: "*",
+}));
 app.use(express.json());
 
 const captalize = require("./utils/capitalizeletter");
@@ -76,7 +78,10 @@ app.post("/gerar-pdf-template", async (req, res) => {
     const nomeArquivo = `${nomeCliente}_ORÇAMENTO.pdf`;
 
     res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", `attachment; filename=${nomeArquivo}`);
+    res.setHeader(
+  "Content-Disposition",
+  `attachment; filename="${nomeArquivo}"`
+);
     res.send(Buffer.from(pdfBytes));
   } catch (err) {
     console.error("Erro ao gerar PDF:", err.message);
@@ -84,6 +89,6 @@ app.post("/gerar-pdf-template", async (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`Servidor rodando em http://localhost:${port}`);
+app.listen(port, "0.0.0.0", () => {
+  console.log(`Servidor rodando`);
 });
